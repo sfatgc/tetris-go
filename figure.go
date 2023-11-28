@@ -45,21 +45,22 @@ func (f *figure) turn(ctx *appContext) bool {
 
 func (f *figure) moveDown(ctx *appContext) bool {
 
+	f.y++
+
 	b := ctx.busy_blocks
 	fb := f.blocks()
 
-	if !b.areHere(fb[0][0], fb[0][1]+1) &&
-		!b.areHere(fb[1][0], fb[1][1]+1) &&
-		!b.areHere(fb[2][0], fb[2][1]+1) &&
-		!b.areHere(fb[3][0], fb[3][1]+1) &&
-		fb[0][1]+1 != ctx.cfg.frameHeight &&
-		fb[1][1]+1 != ctx.cfg.frameHeight &&
-		fb[2][1]+1 != ctx.cfg.frameHeight &&
-		fb[3][1]+1 != ctx.cfg.frameHeight {
+	if !b.areHere(fb[0][0], fb[0][1]) &&
+		!b.areHere(fb[1][0], fb[1][1]) &&
+		!b.areHere(fb[2][0], fb[2][1]) &&
+		!b.areHere(fb[3][0], fb[3][1]) &&
+		f.getDown() != ctx.cfg.frameHeight-1 {
 		f.lastMovement = time.Now()
-		f.y++
 		return true
 	}
+
+	f.y--
+
 	return false
 }
 
