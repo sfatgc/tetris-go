@@ -44,7 +44,7 @@ func (ctx *appContext) updateFigure() bool {
 	f := ctx.figure
 
 	if 3 < time.Since(f.lastTurnover).Seconds() {
-		f.turn()
+		f.turn(ctx)
 	}
 
 	if 0.5 < time.Since(f.lastMovement).Seconds() {
