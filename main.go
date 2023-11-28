@@ -16,12 +16,15 @@ func main() {
 
 	for {
 		t := time.Now()
-		ctx.updateFigure()
-		renderFrame(ctx)
-		showFrame(ctx)
-		ctx.stats.statsUpdate()
-		dt := time.Since(t)
-		time.Sleep((time.Second / 60) - dt)
+		if ctx.updateFigure() {
+			renderFrame(ctx)
+			showFrame(ctx)
+			ctx.stats.statsUpdate()
+			dt := time.Since(t)
+			time.Sleep((time.Second / 60) - dt)
+		} else {
+			break
+		}
 	}
 
 }

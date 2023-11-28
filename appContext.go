@@ -38,7 +38,7 @@ func newAppContext(c *appConfiguration) *appContext {
 	return &context
 }
 
-func (ctx *appContext) updateFigure() {
+func (ctx *appContext) updateFigure() bool {
 
 	f := ctx.figure
 
@@ -49,8 +49,11 @@ func (ctx *appContext) updateFigure() {
 	if 0.5 < time.Since(f.lastMovement).Seconds() {
 		if !f.moveDown(ctx) {
 			ctx.busy_blocks.addFigure(f)
-			ctx.figure = newFigure(3, 0, ctx.cfg.frameWidth/2, ctx.cfg.frameHeight/4)
+			ctx.figure = newFigure(rand.Intn(3)+1, 0, ctx.cfg.frameWidth/2, 0)
+			if ctx.busy_blocks.areHere(ctx.figure.x, ctx.figure.getDown()) {
+				return false
+			}
 		}
 	}
-
+	return true
 }
