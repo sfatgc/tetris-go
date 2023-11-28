@@ -16,7 +16,7 @@ func main() {
 
 	for {
 		t := time.Now()
-		ctx.figure.update()
+		ctx.updateFigure()
 		renderFrame(ctx)
 		showFrame(ctx)
 		ctx.stats.statsUpdate()
@@ -28,40 +28,44 @@ func main() {
 
 func renderFrame(ctx *appContext) {
 
-	frameData := ctx.pastFrame
-
 	for h := 0; h < ctx.cfg.frameWidth; h++ {
 		for v := 0; v < ctx.cfg.frameHeight; v++ {
 
-			frameData[v][h] = EMPTY_AREA_CHARACTER
+			var current_char int = EMPTY_AREA_CHARACTER
 
-			if ctx.figure.here(h, v) {
-				frameData[v][h] = ctx.figure.block(h, v)
+			if ctx.figure.isHere(h, v) {
+				current_char = ctx.figure.block(h, v)
+			}
+
+			if ctx.busy_blocks.areHere(h, v) {
+				current_char = 'X'
 			}
 
 			if h == 0 || h == ctx.cfg.frameWidth-1 {
-				frameData[v][h] = '║'
+				current_char = '║'
 			}
 
 			if v == 0 {
 				if h == 0 {
-					frameData[v][h] = '╔'
+					current_char = '╔'
 				} else if h == ctx.cfg.frameWidth-1 {
-					frameData[v][h] = '╗'
+					current_char = '╗'
 				} else {
-					frameData[v][h] = '═'
+					current_char = '═'
 				}
 			}
 
 			if v == ctx.cfg.frameHeight-1 {
 				if h == 0 {
-					frameData[v][h] = '╚'
+					current_char = '╚'
 				} else if h == ctx.cfg.frameWidth-1 {
-					frameData[v][h] = '╝'
+					current_char = '╝'
 				} else {
-					frameData[v][h] = '═'
+					current_char = '═'
 				}
 			}
+
+			ctx.frameData[v][h] = current_char
 
 		}
 	}
@@ -71,11 +75,9 @@ func renderFrame(ctx *appContext) {
 	for v := 0; v < ctx.cfg.frameHeight; v++ {
 		ctx.buffer.WriteString("\n\t\t\t")
 		for h := 0; h < ctx.cfg.frameWidth; h++ {
-			ctx.buffer.WriteString(string(frameData[v][h]))
+			ctx.buffer.WriteString(string(ctx.frameData[v][h]))
 		}
 	}
-
-	ctx.pastFrame = frameData
 
 }
 

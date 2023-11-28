@@ -1,27 +1,56 @@
 package main
 
-import "bytes"
+import (
+	"bytes"
+	"time"
+)
 
 type appContext struct {
-	cfg       *appConfiguration
-	stats     *appStats
-	buffer    *bytes.Buffer
-	figure    *figure
-	pastFrame [][]int
+	cfg           *appConfiguration
+	stats         *appStats
+	buffer        *bytes.Buffer
+	figure        *figure
+	busy_blocks   *blocks
+	prevFrameData [][]int
+	frameData     [][]int
 }
 
 func newAppContext(c *appConfiguration) *appContext {
 	context := appContext{
-		cfg:       c,
-		stats:     newAppStats(),
-		buffer:    new(bytes.Buffer),
-		figure:    newFigure(3, 0, c.frameWidth/2, c.frameHeight/4),
-		pastFrame: make([][]int, c.frameHeight),
+		cfg:           c,
+		stats:         newAppStats(),
+		buffer:        new(bytes.Buffer),
+		figure:        newFigure(3, 0, c.frameWidth/2, c.frameHeight/4),
+		busy_blocks:   newBlocks(),
+		prevFrameData: make([][]int, c.frameHeight),
+		frameData:     make([][]int, c.frameHeight),
 	}
 
 	for lineNumber := 0; lineNumber < c.frameHeight; lineNumber++ {
-		context.pastFrame[lineNumber] = make([]int, c.frameWidth)
+		context.frameData[lineNumber] = make([]int, c.frameWidth)
+		context.prevFrameData[lineNumber] = make([]int, c.frameWidth)
+		for colNumber := 0; colNumber < c.frameWidth; colNumber++ {
+			context.frameData[lineNumber][colNumber] = EMPTY_AREA_CHARACTER
+			context.prevFrameData[lineNumber][colNumber] = EMPTY_AREA_CHARACTER
+		}
 	}
 
 	return &context
+}
+
+func (ctx *appContext) updateFigure() {
+
+	f := ctx.figure
+
+	if 3 < time.Since(f.lastTurnover).Seconds() {
+		f.turn()
+	}
+
+	if 0.5 < time.Since(f.lastMovement).Seconds() {
+		if !f.moveDown(ctx) {
+			ctx.busy_blocks.addFigure(f)
+			ctx.figure = newFigure(3, 0, ctx.cfg.frameWidth/2, ctx.cfg.frameHeight/4)
+		}
+	}
+
 }

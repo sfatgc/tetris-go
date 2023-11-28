@@ -16,14 +16,15 @@ func newAppStats() *appStats {
 	}
 }
 
-func (this *appStats) statsUpdate() {
+func (stats *appStats) statsUpdate() {
 	t := time.Now()
-	this.framesShown++
-	if this.framesShown == 30 {
+	stats.framesShown++
+	// if stats.framesShown == 10 {
+	if time.Since(stats.start).Milliseconds() >= 1000 {
 
-		this.fps = float64(this.framesShown) / time.Since(this.start).Seconds()
-		this.start = t
-		this.framesShown = 0
+		stats.fps = float64(stats.framesShown) / time.Since(stats.start).Seconds()
+		stats.start = t
+		stats.framesShown = 0
 	}
 
 }

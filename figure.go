@@ -22,23 +22,74 @@ func newFigure(ft, o, x, y int) *figure {
 	}
 }
 
-func (this *figure) update() {
+func (f *figure) turn() {
 
-	if 1.5 < time.Since(this.lastTurnover).Seconds() {
-		this.lastTurnover = time.Now()
-		this.figureOrientation++
-	}
-
-	if 2 < time.Since(this.lastMovement).Seconds() {
-		this.lastMovement = time.Now()
-		this.y++
-	}
+	f.lastTurnover = time.Now()
+	f.figureOrientation++
 
 }
 
-func (this *figure) here(h, v int) bool {
+func (f *figure) moveDown(ctx *appContext) bool {
 
-	b := this.blocks()
+	b := ctx.busy_blocks
+	fb := f.blocks()
+
+	if !b.areHere(fb[0][0], fb[0][1]+1) &&
+		!b.areHere(fb[1][0], fb[1][1]+1) &&
+		!b.areHere(fb[2][0], fb[2][1]+1) &&
+		!b.areHere(fb[3][0], fb[3][1]+1) &&
+		fb[0][1]+1 != ctx.cfg.frameHeight &&
+		fb[1][1]+1 != ctx.cfg.frameHeight &&
+		fb[2][1]+1 != ctx.cfg.frameHeight &&
+		fb[3][1]+1 != ctx.cfg.frameHeight {
+		f.lastMovement = time.Now()
+		f.y++
+		return true
+	}
+	return false
+}
+
+func (f *figure) moveRight() {
+
+	f.lastMovement = time.Now()
+	f.x++
+
+}
+
+func (f *figure) moveLeft() {
+
+	f.lastMovement = time.Now()
+	f.x--
+
+}
+
+func (f *figure) getRight() int {
+	b := f.blocks()
+
+	return max(b[0][0], b[1][0], b[2][0], b[3][0])
+}
+
+func (f *figure) getLeft() int {
+	b := f.blocks()
+
+	return min(b[0][0], b[1][0], b[2][0], b[3][0])
+}
+
+func (f *figure) getDown() int {
+	b := f.blocks()
+
+	return max(b[0][1], b[1][1], b[2][1], b[3][1])
+}
+
+func (f *figure) getUp() int {
+	b := f.blocks()
+
+	return min(b[0][1], b[1][1], b[2][1], b[3][1])
+}
+
+func (f *figure) isHere(h, v int) bool {
+
+	b := f.blocks()
 
 	if h == b[0][0] && v == b[0][1] {
 		return true
@@ -59,8 +110,8 @@ func (this *figure) here(h, v int) bool {
 	return false
 }
 
-func (this *figure) block(h, v int) int {
-	b := this.blocks()
+func (f *figure) block(h, v int) int {
+	b := f.blocks()
 
 	if h == b[0][0] && v == b[0][1] {
 		return '█'
@@ -80,18 +131,18 @@ func (this *figure) block(h, v int) int {
 	return '█'
 }
 
-func (this *figure) blocks() [4][2]int {
+func (f *figure) blocks() [4][2]int {
 	blocks := [4][2]int{}
 
-	switch this.figureType {
+	switch f.figureType {
 	case 1:
-		blocks = this.blocksSquare()
+		blocks = f.blocksSquare()
 	case 2:
-		blocks = this.blocksLine()
+		blocks = f.blocksLine()
 	case 3:
-		blocks = this.blocksL()
+		blocks = f.blocksL()
 	case 4:
-		blocks = this.blocksT()
+		blocks = f.blocksT()
 	}
 
 	return blocks
@@ -99,10 +150,10 @@ func (this *figure) blocks() [4][2]int {
 
 // XX
 // XX
-func (this *figure) blocksSquare() [4][2]int {
+func (f *figure) blocksSquare() [4][2]int {
 	return [4][2]int{
-		{this.x - 1, this.y - 1}, {this.x, this.y - 1},
-		{this.x - 1, this.y}, {this.x, this.y},
+		{f.x - 1, f.y - 1}, {f.x, f.y - 1},
+		{f.x - 1, f.y}, {f.x, f.y},
 	}
 
 }
@@ -111,85 +162,85 @@ func (this *figure) blocksSquare() [4][2]int {
 // X
 // X
 // X
-func (this *figure) blocksLine() [4][2]int {
+func (f *figure) blocksLine() [4][2]int {
 
 	var positions = [2][4][2]int{
 		{
-			{this.x, this.y - 3},
-			{this.x, this.y - 2},
-			{this.x, this.y - 1},
-			{this.x, this.y},
+			{f.x, f.y - 3},
+			{f.x, f.y - 2},
+			{f.x, f.y - 1},
+			{f.x, f.y},
 		},
 		{
-			{this.x - 3, this.y}, {this.x - 2, this.y}, {this.x - 1, this.y}, {this.x, this.y},
+			{f.x - 3, f.y}, {f.x - 2, f.y}, {f.x - 1, f.y}, {f.x, f.y},
 		},
 	}
 
-	return positions[this.figureOrientation%2]
+	return positions[f.figureOrientation%2]
 }
 
 // X
 // X
 // XX
-func (this *figure) blocksL() [4][2]int {
+func (f *figure) blocksL() [4][2]int {
 	var positions = [8][4][2]int{
 		{
-			{this.x - 1, this.y - 2},
-			{this.x - 1, this.y - 1},
-			{this.x - 1, this.y}, {this.x, this.y},
+			{f.x - 1, f.y - 2},
+			{f.x - 1, f.y - 1},
+			{f.x - 1, f.y}, {f.x, f.y},
 		},
 		{
-			{this.x, this.y}, {this.x, this.y - 1}, {this.x + 1, this.y - 1}, {this.x + 2, this.y - 1},
+			{f.x, f.y}, {f.x, f.y - 1}, {f.x + 1, f.y - 1}, {f.x + 2, f.y - 1},
 		},
 		{
-			{this.x, this.y},
-			{this.x + 1, this.y},
-			{this.x + 1, this.y + 1},
-			{this.x + 1, this.y + 2},
+			{f.x, f.y},
+			{f.x + 1, f.y},
+			{f.x + 1, f.y + 1},
+			{f.x + 1, f.y + 2},
 		},
 		{
-			{this.x, this.y}, {this.x, this.y + 1}, {this.x - 1, this.y + 1}, {this.x - 2, this.y + 1},
+			{f.x, f.y}, {f.x, f.y + 1}, {f.x - 1, f.y + 1}, {f.x - 2, f.y + 1},
 		},
 		{
-			{this.x, this.y},
-			{this.x - 1, this.y},
-			{this.x - 1, this.y + 1},
-			{this.x - 1, this.y + 2},
+			{f.x, f.y},
+			{f.x - 1, f.y},
+			{f.x - 1, f.y + 1},
+			{f.x - 1, f.y + 2},
 		},
 		{
-			{this.x, this.y}, {this.x, this.y + 1}, {this.x + 1, this.y + 1}, {this.x + 2, this.y + 1},
+			{f.x, f.y}, {f.x, f.y + 1}, {f.x + 1, f.y + 1}, {f.x + 2, f.y + 1},
 		},
 		{
-			{this.x, this.y},
-			{this.x + 1, this.y},
-			{this.x + 1, this.y - 1},
-			{this.x + 1, this.y - 2},
+			{f.x, f.y},
+			{f.x + 1, f.y},
+			{f.x + 1, f.y - 1},
+			{f.x + 1, f.y - 2},
 		},
 		{
-			{this.x, this.y}, {this.x, this.y - 1}, {this.x - 1, this.y - 1}, {this.x - 2, this.y - 1},
+			{f.x, f.y}, {f.x, f.y - 1}, {f.x - 1, f.y - 1}, {f.x - 2, f.y - 1},
 		},
 	}
 
-	return positions[this.figureOrientation%8]
+	return positions[f.figureOrientation%8]
 }
 
-// ..XX
-// XXXXXX
-func (this *figure) blocksT() [4][2]int {
+// .X
+// XXX
+func (f *figure) blocksT() [4][2]int {
 	var positions = [4][4][2]int{
 		{
-			{this.x, this.y}, {this.x + 1, this.y}, {this.x - 1, this.y}, {this.x, this.y + 1},
+			{f.x, f.y}, {f.x + 1, f.y}, {f.x - 1, f.y}, {f.x, f.y + 1},
 		},
 		{
-			{this.x, this.y}, {this.x + 1, this.y}, {this.x - 1, this.y}, {this.x, this.y - 1},
+			{f.x, f.y}, {f.x + 1, f.y}, {f.x - 1, f.y}, {f.x, f.y - 1},
 		},
 		{
-			{this.x, this.y}, {this.x, this.y - 1}, {this.x, this.y + 1}, {this.x - 1, this.y},
+			{f.x, f.y}, {f.x, f.y - 1}, {f.x, f.y + 1}, {f.x - 1, f.y},
 		},
 		{
-			{this.x, this.y}, {this.x, this.y - 1}, {this.x, this.y + 1}, {this.x + 1, this.y},
+			{f.x, f.y}, {f.x, f.y - 1}, {f.x, f.y + 1}, {f.x + 1, f.y},
 		},
 	}
 
-	return positions[this.figureOrientation%4]
+	return positions[f.figureOrientation%4]
 }
