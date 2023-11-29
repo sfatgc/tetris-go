@@ -69,17 +69,45 @@ func (f *figure) moveDown(ctx *appContext) bool {
 	return false
 }
 
-func (f *figure) moveRight() {
+func (f *figure) moveRight(ctx *appContext) bool {
 
-	f.lastMovement = time.Now()
 	f.x++
+
+	b := ctx.busy_blocks
+	fb := f.blocks()
+
+	if !b.areHere(fb[0][0], fb[0][1]) &&
+		!b.areHere(fb[1][0], fb[1][1]) &&
+		!b.areHere(fb[2][0], fb[2][1]) &&
+		!b.areHere(fb[3][0], fb[3][1]) &&
+		f.getRight() < ctx.cfg.frameWidth-1 {
+		f.lastMovement = time.Now()
+		return true
+	}
+
+	f.x--
+	return false
 
 }
 
-func (f *figure) moveLeft() {
+func (f *figure) moveLeft(ctx *appContext) bool {
 
-	f.lastMovement = time.Now()
 	f.x--
+
+	b := ctx.busy_blocks
+	fb := f.blocks()
+
+	if !b.areHere(fb[0][0], fb[0][1]) &&
+		!b.areHere(fb[1][0], fb[1][1]) &&
+		!b.areHere(fb[2][0], fb[2][1]) &&
+		!b.areHere(fb[3][0], fb[3][1]) &&
+		f.getLeft() > 0 {
+		f.lastMovement = time.Now()
+		return true
+	}
+
+	f.x++
+	return false
 
 }
 
