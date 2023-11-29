@@ -41,7 +41,7 @@ func renderFrame(ctx *appContext) {
 			}
 
 			if ctx.busy_blocks.areHere(h, v) {
-				current_char = 'X'
+				current_char = '▒'
 			}
 
 			if h == 0 || h == ctx.cfg.frameWidth-1 {
