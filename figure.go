@@ -37,7 +37,12 @@ func (f *figure) turn(ctx *appContext) bool {
 		return false
 	}
 
-	// TODO: check if turn intersects any of frame borders
+	// check if turn intersects any of frame borders
+	if f.getLeft() <= 0 ||
+		f.getRight() >= ctx.cfg.frameWidth-1 {
+		f.figureOrientation--
+		return false
+	}
 
 	f.lastTurnover = time.Now()
 	return true
