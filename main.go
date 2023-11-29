@@ -78,7 +78,10 @@ func renderFrame(ctx *appContext) {
 	for v := 0; v < ctx.cfg.frameHeight; v++ {
 		ctx.buffer.WriteString("\n\t\t\t")
 		for h := 0; h < ctx.cfg.frameWidth; h++ {
-			ctx.buffer.WriteString(string(ctx.frameData[v][h]))
+			ctx.buffer.WriteRune(rune(ctx.frameData[v][h]))
+			if h > 0 && h < ctx.cfg.frameWidth-1 {
+				ctx.buffer.WriteRune(rune(ctx.frameData[v][h]))
+			}
 		}
 	}
 
