@@ -21,7 +21,7 @@ func newAppContext(c *appConfiguration) *appContext {
 		cfg:           c,
 		stats:         newAppStats(),
 		buffer:        new(bytes.Buffer),
-		figure:        newFigure(3, 0, c.frameWidth/2, c.frameHeight/4),
+		figure:        newFigure(rand.Intn(4)+1, rand.Intn(8), c.frameWidth/2, c.frameHeight/4),
 		busy_blocks:   newBlocks(),
 		prevFrameData: make([][]int, c.frameHeight),
 		frameData:     make([][]int, c.frameHeight),
@@ -50,7 +50,8 @@ func (ctx *appContext) updateFigure() bool {
 	if 0.5 < time.Since(f.lastMovement).Seconds() {
 		if !f.moveDown(ctx) {
 			ctx.busy_blocks.addFigure(f)
-			ctx.figure = newFigure(rand.Intn(3)+1, 0, ctx.cfg.frameWidth/2, 0)
+			ctx.figure = newFigure(rand.Intn(4)+1, rand.Intn(8), ctx.cfg.frameWidth/2, 0)
+			// TODO: check-up for edge case failures below
 			if ctx.busy_blocks.areHere(ctx.figure.x, ctx.figure.getDown()) {
 				return false
 			}
