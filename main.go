@@ -4,29 +4,77 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	term "github.com/nsf/termbox-go"
 )
 
 const DEFAULT_FRAME_HEIGHT = 30
-const DEFAULT_FRAME_WIDTH = 50
+const DEFAULT_FRAME_WIDTH = 15
 const EMPTY_AREA_CHARACTER = ' '
 
 func main() {
 
 	ctx := newAppContext(newAppConfiguration(DEFAULT_FRAME_HEIGHT, DEFAULT_FRAME_WIDTH))
 
+	err := term.Init()
+	if err != nil {
+		panic(err)
+	}
+
+	defer term.Close()
+
+	inputChannel := make(chan term.Key, 100)
+	timerChannel := time.Tick(50 * time.Millisecond)
+
+	go getInput(ctx, inputChannel)
+
 	for {
-		t := time.Now()
-		if ctx.updateFigure() {
+		if processEvents(ctx, inputChannel, timerChannel) && ctx.updateFigure() {
 			renderFrame(ctx)
 			showFrame(ctx)
 			ctx.stats.statsUpdate()
-			dt := time.Since(t)
-			time.Sleep((time.Second / 60) - dt)
 		} else {
 			break
 		}
 	}
+}
 
+func getInput(ctx *appContext, ic chan term.Key) {
+	for {
+		ev := term.PollEvent()
+
+		switch ev.Type {
+		case term.EventKey:
+			term.Sync()
+			ic <- ev.Key
+		case term.EventError:
+			panic(ev.Err)
+		}
+	}
+}
+
+func processEvents(ctx *appContext, ic chan term.Key, tc <-chan time.Time) bool {
+
+	select {
+	case <-tc:
+		return true
+	case inputKey := <-ic:
+		switch inputKey {
+		case term.KeyEsc:
+			return false
+		case term.KeyArrowUp:
+			ctx.figure.turn(ctx)
+		case term.KeyArrowLeft:
+			ctx.figure.moveLeft(ctx)
+		case term.KeyArrowRight:
+			ctx.figure.moveRight(ctx)
+		case term.KeyArrowDown:
+			ctx.figure.moveDown(ctx)
+			ctx.figure.moveDown(ctx)
+		}
+	}
+
+	return true
 }
 
 func renderFrame(ctx *appContext) {
