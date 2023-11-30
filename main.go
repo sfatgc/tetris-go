@@ -37,6 +37,9 @@ func main() {
 			break
 		}
 	}
+	showFrame(ctx)
+	timerChannel = time.After(5 * time.Second)
+	processEvents(ctx, inputChannel, timerChannel)
 }
 
 func getInput(ctx *appContext, ic chan term.Key) {
