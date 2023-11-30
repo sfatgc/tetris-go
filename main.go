@@ -29,7 +29,7 @@ func main() {
 	go getInput(ctx, inputChannel)
 
 	for {
-		if processEvents(ctx, inputChannel, timerChannel) && ctx.updateFigure() {
+		if processEvents(ctx, inputChannel, timerChannel) && ctx.update() {
 			renderFrame(ctx)
 			showFrame(ctx)
 			ctx.stats.statsUpdate()
@@ -85,11 +85,11 @@ func renderFrame(ctx *appContext) {
 			var current_char int = EMPTY_AREA_CHARACTER
 
 			if ctx.figure.isHere(h, v) {
-				current_char = ctx.figure.block(h, v)
+				current_char = ctx.figure.blockData(h, v)
 			}
 
 			if ctx.busy_blocks.areHere(h, v) {
-				current_char = '▒'
+				current_char = ctx.busy_blocks.busy[v][h].data
 			}
 
 			if h == 0 || h == ctx.cfg.frameWidth-1 {
@@ -140,9 +140,12 @@ func showFrame(ctx *appContext) {
 		"\033[2J\033[1;1H"+
 			"Initialized frame height: %d, width: %d"+
 			"%s"+
-			"\nFrame rate: %f\n",
+			"\nFrame rate: %f\n"+
+			"Round: %d\tSCORE: %d",
 		ctx.cfg.frameHeight,
 		ctx.cfg.frameWidth,
 		ctx.buffer.String(),
-		ctx.stats.fps)
+		ctx.stats.fps,
+		ctx.rounds,
+		ctx.score)
 }

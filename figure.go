@@ -26,7 +26,7 @@ func (f *figure) turn(ctx *appContext) bool {
 
 	f.figureOrientation++
 
-	// check if turn intersects any of byusy blocks
+	// check if turn intersects any of busy blocks
 	b := ctx.busy_blocks
 	fb := f.blocks()
 	if b.areHere(fb[0][0], fb[0][1]) ||
@@ -129,12 +129,13 @@ func (f *figure) getDown() int {
 	return max(b[0][1], b[1][1], b[2][1], b[3][1])
 }
 
-func (f *figure) getUp() int {
-	b := f.blocks()
+/*
+	 func (f *figure) getUp() int {
+		b := f.blocks()
 
-	return min(b[0][1], b[1][1], b[2][1], b[3][1])
-}
-
+		return min(b[0][1], b[1][1], b[2][1], b[3][1])
+	}
+*/
 func (f *figure) isHere(h, v int) bool {
 
 	b := f.blocks()
@@ -158,25 +159,25 @@ func (f *figure) isHere(h, v int) bool {
 	return false
 }
 
-func (f *figure) block(h, v int) int {
+func (f *figure) blockData(h, v int) int {
 	b := f.blocks()
 
 	if h == b[0][0] && v == b[0][1] {
 		return '█'
 	}
 
-	// if h == b[1][0] && v == b[1][1] {
-	// 	return true
-	// }
+	if h == b[1][0] && v == b[1][1] {
+		return '█' //'░'
+	}
 
-	// if h == b[2][0] && v == b[2][1] {
-	// 	return true
-	// }
+	if h == b[2][0] && v == b[2][1] {
+		return '█' //'▒'
+	}
 
-	// if h == b[3][0] && v == b[3][1] {
-	// 	return true
-	// }
-	return '█'
+	if h == b[3][0] && v == b[3][1] {
+		return '█' //'▓'
+	}
+	return 'S'
 }
 
 func (f *figure) blocks() [4][2]int {

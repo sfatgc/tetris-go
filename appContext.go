@@ -7,49 +7,54 @@ import (
 )
 
 type appContext struct {
-	cfg           *appConfiguration
-	stats         *appStats
-	buffer        *bytes.Buffer
-	figure        *figure
-	busy_blocks   *blocks
-	prevFrameData [][]int
-	frameData     [][]int
+	cfg         *appConfiguration
+	stats       *appStats
+	rounds      int
+	score       int
+	buffer      *bytes.Buffer
+	figure      *figure
+	busy_blocks *blocks
+	frameData   [][]int
 }
 
 func newAppContext(c *appConfiguration) *appContext {
 	context := appContext{
-		cfg:           c,
-		stats:         newAppStats(),
-		buffer:        new(bytes.Buffer),
-		figure:        newFigure(rand.Intn(4)+1, rand.Intn(8), c.frameWidth/2, c.frameHeight/4),
-		busy_blocks:   newBlocks(),
-		prevFrameData: make([][]int, c.frameHeight),
-		frameData:     make([][]int, c.frameHeight),
+		cfg:         c,
+		stats:       newAppStats(),
+		rounds:      0,
+		score:       0,
+		buffer:      new(bytes.Buffer),
+		figure:      newFigure(rand.Intn(4)+1, rand.Intn(8), c.frameWidth/2, c.frameHeight/4),
+		busy_blocks: newBlocks(c.frameWidth, c.frameHeight),
+		frameData:   make([][]int, c.frameHeight),
 	}
 
 	for lineNumber := 0; lineNumber < c.frameHeight; lineNumber++ {
 		context.frameData[lineNumber] = make([]int, c.frameWidth)
-		context.prevFrameData[lineNumber] = make([]int, c.frameWidth)
-		for colNumber := 0; colNumber < c.frameWidth; colNumber++ {
-			context.frameData[lineNumber][colNumber] = EMPTY_AREA_CHARACTER
-			context.prevFrameData[lineNumber][colNumber] = EMPTY_AREA_CHARACTER
-		}
 	}
 
 	return &context
 }
 
-func (ctx *appContext) updateFigure() bool {
+func (ctx *appContext) update() bool {
 
-	f := ctx.figure
+	if ctx.busy_blocks.deletable_lines {
+		ctx.score += ctx.busy_blocks.delete_deletable_lines()
+	} else {
 
-	if 0.5 < time.Since(f.lastMovement).Seconds() {
-		if !f.moveDown(ctx) {
-			ctx.busy_blocks.addFigure(f)
-			ctx.figure = newFigure(rand.Intn(4)+1, rand.Intn(8), ctx.cfg.frameWidth/2, 0)
-			// TODO: check-up for edge case failures below
-			if ctx.busy_blocks.areHere(ctx.figure.x, ctx.figure.getDown()) {
-				return false
+		f := ctx.figure
+
+		if 0.5 < time.Since(f.lastMovement).Seconds() {
+			if !f.moveDown(ctx) {
+				ctx.busy_blocks.addFigure(f)
+				ctx.figure = newFigure(rand.Intn(4)+1, rand.Intn(8), ctx.cfg.frameWidth/2, 0)
+				ctx.rounds++
+
+				// TODO: check-up for edge case failures below
+				if /* !ctx.busy_blocks.marked_lines && !ctx.busy_blocks.deletable_lines &&  */ ctx.busy_blocks.areHere(ctx.figure.x, ctx.figure.getDown()) {
+					return false
+				}
+
 			}
 		}
 	}
