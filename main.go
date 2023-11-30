@@ -80,6 +80,35 @@ func processEvents(ctx *appContext, ic chan term.Key, tc <-chan time.Time) bool 
 	return true
 }
 
+func renderFrameBorders(ctx *appContext, current_char, h, v int) int {
+
+	if h == 0 || h == ctx.cfg.frameWidth-1 {
+		current_char = '║'
+	}
+
+	if v == 0 {
+		if h == 0 {
+			current_char = '╔'
+		} else if h == ctx.cfg.frameWidth-1 {
+			current_char = '╗'
+		} else {
+			current_char = '═'
+		}
+	}
+
+	if v == ctx.cfg.frameHeight-1 {
+		if h == 0 {
+			current_char = '╚'
+		} else if h == ctx.cfg.frameWidth-1 {
+			current_char = '╝'
+		} else {
+			current_char = '═'
+		}
+	}
+
+	return current_char
+}
+
 func renderFrame(ctx *appContext) {
 
 	for h := 0; h < ctx.cfg.frameWidth; h++ {
@@ -95,29 +124,7 @@ func renderFrame(ctx *appContext) {
 				current_char = ctx.busy_blocks.busy[v][h].data
 			}
 
-			if h == 0 || h == ctx.cfg.frameWidth-1 {
-				current_char = '║'
-			}
-
-			if v == 0 {
-				if h == 0 {
-					current_char = '╔'
-				} else if h == ctx.cfg.frameWidth-1 {
-					current_char = '╗'
-				} else {
-					current_char = '═'
-				}
-			}
-
-			if v == ctx.cfg.frameHeight-1 {
-				if h == 0 {
-					current_char = '╚'
-				} else if h == ctx.cfg.frameWidth-1 {
-					current_char = '╝'
-				} else {
-					current_char = '═'
-				}
-			}
+			current_char = renderFrameBorders(ctx, current_char, h, v)
 
 			ctx.frameData[v][h] = current_char
 
