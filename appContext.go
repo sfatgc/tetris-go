@@ -38,13 +38,13 @@ func newAppContext(c *appConfiguration) *appContext {
 
 func (ctx *appContext) update() bool {
 
-	if ctx.busy_blocks.deletable_lines {
-		ctx.score += ctx.busy_blocks.delete_deletable_lines()
-	} else {
+	f := ctx.figure
 
-		f := ctx.figure
+	if int64(500-(ctx.score*20)) < time.Since(f.lastMovement).Milliseconds() {
+		if ctx.busy_blocks.deletable_lines {
+			ctx.score += ctx.busy_blocks.delete_deletable_lines()
+		} else {
 
-		if 0.5 < time.Since(f.lastMovement).Seconds() {
 			if !f.moveDown(ctx) {
 				ctx.busy_blocks.addFigure(f)
 				ctx.figure = newFigure(rand.Intn(4)+1, rand.Intn(8), ctx.cfg.frameWidth/2, 0)
