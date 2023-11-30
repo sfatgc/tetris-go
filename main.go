@@ -24,7 +24,7 @@ func main() {
 	defer term.Close()
 
 	inputChannel := make(chan term.Key, 100)
-	timerChannel := time.Tick(50 * time.Millisecond)
+	timerChannel := time.Tick(10 * time.Millisecond)
 
 	go getInput(ctx, inputChannel)
 
