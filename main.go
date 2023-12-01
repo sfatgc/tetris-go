@@ -152,11 +152,16 @@ func showFrame(ctx *appContext) {
 			"Initialized frame height: %d, width: %d"+
 			"%s"+
 			"\nFrame rate: %f\n"+
-			"Round: %d\tSCORE: %d",
+			"Round: %d\tSCORE: %d\n"+
+			"\nFigure type: %d/%d\n"+
+			"Figure blocks: %v\n",
 		ctx.cfg.frameHeight,
 		ctx.cfg.frameWidth,
 		ctx.buffer.String(),
 		ctx.stats.fps,
 		ctx.rounds,
-		ctx.score)
+		ctx.score,
+		ctx.figure.figureType,
+		ctx.figure.figureOrientation,
+		ctx.figure.blocks())
 }
