@@ -183,7 +183,7 @@ func (f *figure) blockData(h, v int) int {
 func (f *figure) blocks() [4][2]int {
 	blocks := [4][2]int{}
 
-	switch f.figureType % 6 {
+	switch f.figureType % 7 {
 	case 0:
 		blocks = f.blocksSquare()
 	case 1:
@@ -196,6 +196,8 @@ func (f *figure) blocks() [4][2]int {
 		blocks = f.blocksS()
 	case 5:
 		blocks = f.blocksX()
+	case 6:
+		blocks = f.blocks6()
 	}
 
 	return blocks
@@ -337,6 +339,29 @@ func (f *figure) blocksS() [4][2]int {
 		},
 		{
 			{f.x + 1, f.y}, {f.x + 1, f.y - 1}, {f.x, f.y - 1}, {f.x, f.y - 2},
+		},
+	}
+
+	return positions[f.figureOrientation%4]
+}
+
+// ........X.......X
+// .........X.....X.....XX.
+// .X..X....X.....X....X..X
+// ..XX....X.......X.......
+func (f *figure) blocks6() [4][2]int {
+	var positions = [4][4][2]int{
+		{
+			{f.x, f.y}, {f.x + 1, f.y}, {f.x - 1, f.y - 1}, {f.x + 2, f.y - 1},
+		},
+		{
+			{f.x, f.y}, {f.x, f.y - 1}, {f.x - 1, f.y - 2}, {f.x - 1, f.y + 1},
+		},
+		{
+			{f.x, f.y}, {f.x, f.y - 1}, {f.x + 1, f.y - 2}, {f.x + 1, f.y + 1},
+		},
+		{
+			{f.x, f.y}, {f.x + 1, f.y}, {f.x - 1, f.y + 1}, {f.x + 2, f.y + 1},
 		},
 	}
 
