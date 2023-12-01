@@ -37,6 +37,7 @@ func main() {
 			break
 		}
 	}
+	renderFrame(ctx)
 	showFrame(ctx)
 	timerChannel = time.After(5 * time.Second)
 	processEvents(ctx, inputChannel, timerChannel)
