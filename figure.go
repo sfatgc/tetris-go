@@ -183,14 +183,14 @@ func (f *figure) blockData(h, v int) int {
 func (f *figure) blocks() [4][2]int {
 	blocks := [4][2]int{}
 
-	switch f.figureType {
-	case 1:
+	switch f.figureType % 4 {
+	case 0:
 		blocks = f.blocksSquare()
-	case 2:
+	case 1:
 		blocks = f.blocksLine()
-	case 3:
+	case 2:
 		blocks = f.blocksL()
-	case 4:
+	case 3:
 		blocks = f.blocksT()
 	}
 
