@@ -24,7 +24,7 @@ func newAppContext(c *appConfiguration) *appContext {
 		rounds:      0,
 		score:       0,
 		buffer:      new(bytes.Buffer),
-		figure:      newFigure(rand.Intn(4), rand.Intn(8), c.frameWidth/2, c.frameHeight/4),
+		figure:      newFigure(rand.Intn(6), rand.Intn(8), c.frameWidth/2, c.frameHeight/4),
 		busy_blocks: newBlocks(c.frameWidth, c.frameHeight),
 		frameData:   make([][]int, c.frameHeight),
 	}
@@ -47,7 +47,7 @@ func (ctx *appContext) update() bool {
 
 			if !f.moveDown(ctx) {
 				ctx.busy_blocks.addFigure(f)
-				ctx.figure = newFigure(rand.Intn(4), rand.Intn(8), ctx.cfg.frameWidth/2, 0)
+				ctx.figure = newFigure(rand.Intn(6), rand.Intn(8), ctx.cfg.frameWidth/2, 0)
 				ctx.rounds++
 
 				// TODO: check-up for edge case failures below
