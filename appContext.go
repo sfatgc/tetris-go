@@ -40,7 +40,7 @@ func (ctx *appContext) update() bool {
 
 	f := ctx.figure
 
-	if int64(500-(ctx.score*20)) < time.Since(f.lastMovement).Milliseconds() {
+	if int64(500-(ctx.score*10)) < time.Since(f.lastMovement).Milliseconds() {
 		if ctx.busy_blocks.deletable_lines {
 			ctx.score += ctx.busy_blocks.delete_deletable_lines()
 		} else {
