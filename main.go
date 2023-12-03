@@ -29,18 +29,23 @@ func main() {
 	go getInput(ctx, inputChannel)
 
 	for {
-		if processEvents(ctx, inputChannel, timerChannel) && ctx.update() {
-			renderFrame(ctx)
-			showFrame(ctx)
-			ctx.stats.statsUpdate()
+		if processEvents(ctx, inputChannel, timerChannel) {
+			if ctx.update() {
+				renderFrame(ctx)
+				showFrame(ctx)
+				ctx.stats.statsUpdate()
+			} else {
+				renderFrame(ctx)
+				showFrame(ctx)
+				timerChannelEOG := time.After(5 * time.Second)
+				processEvents(ctx, inputChannel, timerChannelEOG)
+				ctx = newAppContext(newAppConfiguration(DEFAULT_FRAME_HEIGHT, DEFAULT_FRAME_WIDTH))
+			}
 		} else {
 			break
 		}
 	}
-	renderFrame(ctx)
-	showFrame(ctx)
-	timerChannel = time.After(5 * time.Second)
-	processEvents(ctx, inputChannel, timerChannel)
+
 }
 
 func getInput(ctx *appContext, ic chan term.Key) {
