@@ -300,32 +300,9 @@ func (f *figure) blocksT() [4][2]int {
 	return positions[f.figureOrientation%4]
 }
 
-/*
-X X   X
-
-	.  X . X
-
-X X   X
-*/
-func (f *figure) blocksX() [4][2]int {
-
-	var positions = [2][4][2]int{
-		{
-			{f.x - 1, f.y - 1}, {f.x + 1, f.y - 1},
-			{f.x - 1, f.y + 1}, {f.x + 1, f.y + 1},
-		},
-		{
-			{f.x - 1, f.y}, {f.x + 1, f.y}, {f.x, f.y - 1}, {f.x, f.y + 1},
-		},
-	}
-
-	return positions[f.figureOrientation%2]
-
-}
-
-// .........X.X
-// .XX.XX..XX.XX
-// XX...XX.X...X
+// ...........X..X
+// .XX..XX...XX..XX
+// XX....XX..X....X
 func (f *figure) blocksS() [4][2]int {
 	var positions = [4][4][2]int{
 		{
@@ -343,6 +320,27 @@ func (f *figure) blocksS() [4][2]int {
 	}
 
 	return positions[f.figureOrientation%4]
+}
+
+/*
+...X.X.....X..
+..........X.X
+...X.X.....X..
+*/
+func (f *figure) blocksX() [4][2]int {
+
+	var positions = [2][4][2]int{
+		{
+			{f.x - 1, f.y - 1}, {f.x + 1, f.y - 1},
+			{f.x - 1, f.y + 1}, {f.x + 1, f.y + 1},
+		},
+		{
+			{f.x - 1, f.y}, {f.x + 1, f.y}, {f.x, f.y - 1}, {f.x, f.y + 1},
+		},
+	}
+
+	return positions[f.figureOrientation%2]
+
 }
 
 // ........X.......X
