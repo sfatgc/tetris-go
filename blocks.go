@@ -31,7 +31,7 @@ func (b *blocks) addFigure(f *figure) {
 	for _, fb := range f.blocks() {
 		h := fb[0]
 		v := fb[1]
-		if 0 <= h && h < b.width && 0 <= v && v < b.height && !b.areHere(h, v) {
+		if 0 <= h && h < b.width && 0 <= v && v < b.height /* && !b.areHere(h, v) */ {
 			b.busy[v][h].is_busy = true
 			b.busy[v][h].data = '▒'
 			if b.line_full(v) {
@@ -70,7 +70,9 @@ func (b *blocks) delete_deletable_lines() int {
 
 func (b *blocks) delete_line(v int) {
 	for lineNumber := v; lineNumber > 0; lineNumber-- {
-		b.busy[lineNumber] = b.busy[lineNumber-1]
+		for columnNumber := 0; columnNumber < b.width; columnNumber++ {
+			b.busy[lineNumber][columnNumber] = b.busy[lineNumber-1][columnNumber]
+		}
 	}
 	for columnNumber := 0; columnNumber < b.width; columnNumber++ {
 		b.busy[0][columnNumber].is_busy = false
